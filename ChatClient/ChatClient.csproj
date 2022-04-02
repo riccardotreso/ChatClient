@@ -7,8 +7,10 @@
 
   <ItemGroup>
     <None Remove="Model\" />
+    <None Remove="ChatRoom\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
+    <Folder Include="Common\" />
   </ItemGroup>
 </Project>
