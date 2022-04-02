@@ -2,20 +2,23 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using ChatClient.Model;
 
 namespace ChatClient
 {
+
+
     public class ChatRoom
     {
         Socket senderClient;
+        public event EventHandler<string> OnMessageArrived;
         public ChatRoom()
         {
         }
 
         public void Connect()
         {
-
 
             // Connect to a remote device.  
             try
@@ -59,7 +62,7 @@ namespace ChatClient
             }
         }
 
-        public bool EnterInRoom(string NickName)
+        public ChatResponse EnterInRoom(string NickName)
         {
             // Data buffer for incoming data.  
             byte[] bytes = new byte[1024];
@@ -67,7 +70,8 @@ namespace ChatClient
             // Encode the data string into a byte array.  
             byte[] msg = Encoding.ASCII.GetBytes(ChatCommandFactory.Login(NickName).ToString());
 
-            // Send the data through the socket.  
+            // Send the data through the socket.
+            
             int bytesSent = senderClient.Send(msg);
 
             // Receive the response from the remote device.  
@@ -75,11 +79,44 @@ namespace ChatClient
             string responseMessage = Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
             var response = ChatResponse.Parse(responseMessage);
-            return !response.IsError;
-            
+
+            if (!response.IsError)
+                ListenMessages();
+
+            return response;
         }
 
-        ~ChatRoom() 
+        public void SendMessage(string NickName, string Message)
+        {
+
+        }
+
+        private void ListenMessages()
+        {
+            Task.Run(() =>
+            {
+                // Data buffer for incoming data.  
+                byte[] bytes = new byte[1024];
+                // An incoming connection needs to be processed.  
+                while (true)
+                {
+                    // Receive the response from the remote device.  
+                    int bytesRec = senderClient.Receive(bytes);
+                    string message = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    if (OnMessageArrived != null)
+                        OnMessageArrived.Invoke(this, message);
+
+
+                }
+            });
+
+        }
+
+
+
+
+        ~ChatRoom()
         {
             // Release the socket.  
             senderClient.Shutdown(SocketShutdown.Both);
