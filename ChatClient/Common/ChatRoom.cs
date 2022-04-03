@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using ChatClient.Model;
+using System.Linq;
 
 namespace ChatClient
 {
@@ -80,10 +81,10 @@ namespace ChatClient
 
             var response = ChatResponse.Parse(responseMessage);
 
-            if (!response.IsError)
+            if (!response.First().IsError)
                 ListenMessages();
 
-            return response;
+            return response.First();
         }
 
         public void SendMessage(string NickName, string Message)
@@ -106,11 +107,14 @@ namespace ChatClient
                     int bytesRec = senderClient.Receive(bytes);
                     string message = Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
-                    var response = ChatResponse.Parse(message);
-                    if (response.Data != "ACK")
+                    var responses = ChatResponse.Parse(message);
+                    foreach (var response in responses)
                     {
-                        if (OnMessageArrived != null)
-                            OnMessageArrived.Invoke(this, response.Data);
+                        if (response.Data != "ACK")
+                        {
+                            if (OnMessageArrived != null)
+                                OnMessageArrived.Invoke(this, response.Data);
+                        }
                     }
                 }
             });
