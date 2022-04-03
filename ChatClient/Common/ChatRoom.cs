@@ -71,7 +71,7 @@ namespace ChatClient
             byte[] msg = Encoding.ASCII.GetBytes(ChatCommandFactory.Login(NickName).ToString());
 
             // Send the data through the socket.
-            
+
             int bytesSent = senderClient.Send(msg);
 
             // Receive the response from the remote device.  
@@ -88,7 +88,9 @@ namespace ChatClient
 
         public void SendMessage(string NickName, string Message)
         {
+            byte[] msg = Encoding.ASCII.GetBytes(ChatCommandFactory.Text(new User { NickName = NickName }, Message).ToString());
 
+            int bytesSent = senderClient.Send(msg);
         }
 
         private void ListenMessages()
@@ -104,10 +106,12 @@ namespace ChatClient
                     int bytesRec = senderClient.Receive(bytes);
                     string message = Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
-                    if (OnMessageArrived != null)
-                        OnMessageArrived.Invoke(this, message);
-
-
+                    var response = ChatResponse.Parse(message);
+                    if (response.Data != "ACK")
+                    {
+                        if (OnMessageArrived != null)
+                            OnMessageArrived.Invoke(this, response.Data);
+                    }
                 }
             });
 

@@ -25,8 +25,16 @@ namespace ChatClient
             Console.WriteLine($"Welcome {nickname}, your id is {response.Data}");
 
             chatRoom.OnMessageArrived += ChatRoom_OnMessageArrived;
-
-            Console.ReadLine();
+            string message = string.Empty;
+            while (true)
+            {
+                Console.WriteLine("Type our message; Q for exit");
+                message = Console.ReadLine();
+                if ("Q".Equals(message, StringComparison.CurrentCultureIgnoreCase))
+                    break;
+                chatRoom.SendMessage(nickname, message);
+            }
+            
 
         }
 
