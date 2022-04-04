@@ -2,7 +2,14 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using ChatClient.Model;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace ChatClient
 {
@@ -12,6 +19,25 @@ namespace ChatClient
         static void Main(string[] args)
         {
             ChatRoom chatRoom = new ChatRoom();
+            /*var host = new WebHostBuilder()
+            .UseKestrel()
+            .UseUrls("http://*:9999")
+            .UseStartup<Startup>()
+            .Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                chatRoom = services.GetRequiredService<ChatRoom>();
+
+            }
+            Task.Run(() =>
+            {
+                host.Run();
+            });
+            */
+
             chatRoom.Connect();
             Console.WriteLine("Type your nickname");
             string nickname = Console.ReadLine();
@@ -34,13 +60,25 @@ namespace ChatClient
                     break;
                 chatRoom.SendMessage(nickname, message);
             }
-            
+
 
         }
 
         private static void ChatRoom_OnMessageArrived(object sender, string e)
         {
             Console.WriteLine(e);
+        }
+
+
+
+    }
+
+    public class SayHi : ControllerBase
+    {
+        [Route("sayhi/{name}")]
+        public IActionResult Get(string name)
+        {
+            return Ok($"Hello {name}");
         }
     }
 }

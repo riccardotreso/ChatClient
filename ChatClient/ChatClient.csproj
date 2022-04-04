@@ -8,9 +8,20 @@
   <ItemGroup>
     <None Remove="Model\" />
     <None Remove="ChatRoom\" />
+    <None Remove="Microsoft.Extensions.Hosting.WindowsServices" />
+    <None Remove="Microsoft.Extensions.Hosting" />
+    <None Remove="Microsoft.AspNet.Mvc" />
+    <None Remove="Microsoft.AspNetCore.Mvc" />
+    <None Remove="Microsoft.Extensions.DependencyInjection" />
+    <None Remove="Microsoft.AspNetCore.Owin" />
+    <None Remove="Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
     <Folder Include="Common\" />
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="5.0.15" />
   </ItemGroup>
 </Project>
