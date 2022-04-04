@@ -34,26 +34,34 @@ namespace ChatClient
                 senderClient = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
-                // Connect the socket to the remote endpoint. Catch any errors.  
-                try
+                while (!senderClient.Connected)
                 {
-                    senderClient.Connect(remoteEP);
+                    // Connect the socket to the remote endpoint. Catch any errors.  
+                    try
+                    {
+                        senderClient.Connect(remoteEP);
 
-                    Console.WriteLine("Socket connected to {0}",
-                        senderClient.RemoteEndPoint.ToString());
+                        Console.WriteLine("Chat connected to {0}",
+                            senderClient.RemoteEndPoint.ToString());
 
-                }
-                catch (ArgumentNullException ane)
-                {
-                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
-                }
-                catch (SocketException se)
-                {
-                    Console.WriteLine("SocketException : {0}", se.ToString());
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    }
+                    catch (ArgumentNullException ane)
+                    {
+                        Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                    }
+                    catch (SocketException se)
+                    {
+                        Console.WriteLine("ChatServer not found. {0}", se.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    }
+
+                    if (!senderClient.Connected) {
+                        Console.WriteLine("Wait 30 sec and try to reconnect...");
+                        Task.Delay(30000).Wait();
+                    }
                 }
 
             }
