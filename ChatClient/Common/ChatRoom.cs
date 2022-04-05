@@ -12,6 +12,7 @@ namespace ChatClient
 
     public class ChatRoom
     {
+        private string NickName;
         Socket senderClient;
         public event EventHandler<string> OnMessageArrived;
         public ChatRoom()
@@ -52,7 +53,7 @@ namespace ChatClient
                     }
                     catch (SocketException se)
                     {
-                        Console.WriteLine("SocketException : {0}", se.ToString());
+                        Console.WriteLine("SocketException : {0}", se.Message);
                     }
                     catch (Exception e)
                     {
@@ -93,12 +94,16 @@ namespace ChatClient
             var response = ChatResponse.Parse(responseMessage);
 
             if (!response.First().IsError)
+            {
+                this.NickName = NickName;
                 ListenMessages();
+            }
+                
 
             return response.First();
         }
 
-        public void SendMessage(string NickName, string Message)
+        public void SendMessage(string Message)
         {
             byte[] msg = Encoding.ASCII.GetBytes(ChatCommandFactory.Text(new User { NickName = NickName }, Message).ToString());
 
