@@ -24,6 +24,7 @@ namespace ChatClient
             // Connect to a remote device.  
             try
             {
+
                 // Establish the remote endpoint for the socket.  
                 // This example uses port 11000 on the local computer.  
                 IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
@@ -34,33 +35,43 @@ namespace ChatClient
                 senderClient = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
-                // Connect the socket to the remote endpoint. Catch any errors.  
-                try
+                while (!senderClient.Connected)
                 {
-                    senderClient.Connect(remoteEP);
+                    // Connect the socket to the remote endpoint. Catch any errors.  
+                    try
+                    {
+                        senderClient.Connect(remoteEP);
 
-                    Console.WriteLine("Socket connected to {0}",
-                        senderClient.RemoteEndPoint.ToString());
+                        Console.WriteLine("Chat connected to {0}",
+                            senderClient.RemoteEndPoint.ToString());
+
+                    }
+                    catch (ArgumentNullException ane)
+                    {
+                        Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                    }
+                    catch (SocketException se)
+                    {
+                        Console.WriteLine("SocketException : {0}", se.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    }
+
+                    if (!senderClient.Connected)
+                    {
+                        Console.WriteLine("Wait 30 sec and try to reconnect...");
+                        Task.Delay(30000).Wait();
+                    }
 
                 }
-                catch (ArgumentNullException ane)
-                {
-                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
-                }
-                catch (SocketException se)
-                {
-                    Console.WriteLine("SocketException : {0}", se.ToString());
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
-                }
-
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+
         }
 
         public ChatResponse EnterInRoom(string NickName)
